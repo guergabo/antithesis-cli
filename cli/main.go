@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// TODO: add cool logo.
+
 func AntithesisCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Version: version(),

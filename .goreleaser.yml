@@ -60,10 +60,10 @@ brews:
     repository: 
       owner: guergabo
       name: homebrew-antithesis
-      branch: main
+      branch: "antithesis-{{ .Version }}"
       token: "{{ .Env.GH_TOKEN_HOMEBREW_ANTITHESIS }}"
       pull_request:
         enabled: true
         draft: true
-        target_branch: main 
-        base_branch: formula-updates
+        base: 
+          branch: main
