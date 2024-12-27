@@ -67,7 +67,7 @@ func latestVersion() (string, error) {
 		return "", fmt.Errorf("failed to decode release response: %w", err)
 	}
 
-	// Remove 'v' prefix if present
+	// Normalize by removing 'v' prefix if present
 	version := strings.TrimPrefix(release.TagName, "v")
 	return version, nil
 }
