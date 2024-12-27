@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+//
 // TODO: mention must build and push images first.
 
 func runCommand() *cobra.Command {
@@ -32,7 +33,7 @@ func runCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "run [flags]",
 		Long:    "Run an antithesis test.",
-		Short:   "Run an antithesis test with the specified configuration/",
+		Short:   "Run an antithesis test",
 		GroupID: "antithesis",
 		Example: `
 # Run a test.
@@ -53,6 +54,8 @@ antithesis run \
   --email='gguergabo@gmail.com'`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			url := fmt.Sprintf("https://%s.antithesis.com/api/v1/launch_experiment/%s", tenant, notebook)
+
+			// TODO: validation
 
 			// TODO: trim white space.
 			params := map[string]string{

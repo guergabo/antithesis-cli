@@ -2,20 +2,35 @@ package cli
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
-
-// TODO: add cool logo.
 
 func AntithesisCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Version: version(),
 		Use:     "antithesis",
-		Long:    "The entrypoint of the antithesis ecosystem.",
-		Short:   "Antithesis CLI",
+		Long: `
+█████╗ ███╗   ██╗████████╗██╗████████╗██╗  ██╗███████╗███████╗██╗███████╗
+██╔══██╗████╗  ██║╚══██╔══╝██║╚══██╔══╝██║  ██║██╔════╝██╔════╝██║██╔════╝
+███████║██╔██╗ ██║   ██║   ██║   ██║   ███████║█████╗  ███████╗██║███████╗
+██╔══██║██║╚██╗██║   ██║   ██║   ██║   ██╔══██║██╔══╝  ╚════██║██║╚════██║
+██║  ██║██║ ╚████║   ██║   ██║   ██║   ██║  ██║███████╗███████║██║███████║
+╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝╚══════╝
+																					
+The entrypoint of the antithesis ecosystem. Build the impossible.`,
+		Short: "Antithesis CLI",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			return nil // Environment variables + Check for latest release.
+			// Eagerly inform customers of when a new update is available.
+			current := version()
+			latest, _ := latestVersion() // suppress to not interfere.
+			if current == "dev" || current >= latest {
+				return nil
+			}
+			fmt.Printf("A new update is available. To install it, run 'antithesis update'\n")
+			// TODO: Environment variables, config.
+			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
