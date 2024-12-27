@@ -8,6 +8,8 @@
 <hr />
 
 [![Build](https://github.com/guergabo/antithesis-cli/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/guergabo/antithesis-cli/actions/workflows/build.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/guergabo/antithesis-cli)](https://goreportcard.com/report/github.com/guergabo/antithesis-cli)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 **Antithesis** is a platform for building the impossible.
 
