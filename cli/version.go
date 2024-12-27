@@ -45,7 +45,7 @@ func version() string {
 			}
 		}
 	}
-	return version
+	return strings.TrimPrefix(version, "v")
 }
 
 func latestVersion() (string, error) {

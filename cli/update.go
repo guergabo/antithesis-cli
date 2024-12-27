@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	hashi_version "github.com/hashicorp/go-version"
 	"github.com/spf13/cobra"
 )
 
@@ -36,8 +37,21 @@ antithesis update
 				fmt.Printf("You're compiling from source.\n")
 				return nil
 			}
-			if current >= latest {
+
+			// Convert to compare properly.
+
+			c, err := hashi_version.NewVersion(current)
+			if err != nil {
+				fmt.Errorf("failed to get current version: %w", err)
+			}
+			l, err := hashi_version.NewVersion(latest)
+			if err != nil {
+				fmt.Errorf("failed to get latest version: %w", err)
+			}
+
+			if c.GreaterThanOrEqual(l) {
 				fmt.Printf("version %s is already latest\n", current)
+				return nil
 			}
 
 			var confirm string
