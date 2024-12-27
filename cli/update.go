@@ -42,11 +42,11 @@ antithesis update
 
 			c, err := hashi_version.NewVersion(current)
 			if err != nil {
-				fmt.Errorf("failed to get current version: %w", err)
+				return fmt.Errorf("failed to get current version: %w", err)
 			}
 			l, err := hashi_version.NewVersion(latest)
 			if err != nil {
-				fmt.Errorf("failed to get latest version: %w", err)
+				return fmt.Errorf("failed to get latest version: %w", err)
 			}
 
 			if c.GreaterThanOrEqual(l) {
