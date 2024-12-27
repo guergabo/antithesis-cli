@@ -65,8 +65,8 @@ antithesis run \
 				"antithesis.duration":          fmt.Sprintf("%d", duration),
 			}
 
-			fmt.Printf("%v\n", params)
-			return nil
+			// fmt.Printf("%v\n", params)
+			// return nil
 
 			body := &struct {
 				Params map[string]string `json:"params"`
@@ -74,7 +74,7 @@ antithesis run \
 
 			jsonBody, err := json.Marshal(body)
 			if err != nil {
-				return fmt.Errorf("failed to marshal request body: &v\n", err)
+				return fmt.Errorf("failed to marshal request body: %v\n", err)
 			}
 
 			req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))

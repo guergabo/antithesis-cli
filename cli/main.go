@@ -29,12 +29,12 @@ func AntithesisCommand() *cobra.Command {
 		Title: "Development Commands:",
 	})
 
-	// cmd.AddCommand(authCommand())
-	// cmd.AddCommand(configCommand())
+	cmd.AddCommand(authCommand())   // *
+	cmd.AddCommand(configCommand()) // *
 	cmd.AddCommand(contactCommand())
 	cmd.AddCommand(updateCommand())
 	cmd.AddCommand(versionCommand())
-	// cmd.AddCommand(debugCommand())
+	cmd.AddCommand(debugCommand()) // *
 	cmd.AddCommand(initCommand())
 	cmd.AddCommand(runCommand())
 
