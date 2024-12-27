@@ -41,7 +41,7 @@ To create your first **Antithesis** test run, see our
 antithesis run \
   --name='quickstart' \
   --description='Running a quick antithesis test.' \
-  --tenant='tenant-name' \
+  --tenant='tenant' \
   --username='username' \
   --password='password' \
   --config='<registry>/<namespace>/config:latest' \

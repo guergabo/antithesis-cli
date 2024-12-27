@@ -102,14 +102,15 @@ antithesis run \
 		},
 	}
 
+	// TODO: antithesis run ( implicit antithesis.toml ) ( config will be toml ).
 	cmd.Flags().StringVarP(&name, "name", "n", "", "unique identifier for this test run")
 	cmd.Flags().StringVarP(&description, "description", "d", "", "description explaining the purpose of this test run")
-	cmd.Flags().StringVarP(&notebook, "notebook", "b", "basic_test", "notebook to execute")
 	cmd.Flags().StringVarP(&tenant, "tenant", "t", "", "target tenant ID for test execution")
 	cmd.Flags().StringVarP(&username, "username", "u", "", "authentication username for accessing test resources")
 	cmd.Flags().StringVarP(&password, "password", "p", "", "authentication password for accessing test resources")
 	cmd.Flags().StringVarP(&config, "config", "c", "", "url of configuration image containing docker-compose setup")
 	cmd.Flags().StringArrayVarP(&images, "image", "i", make([]string, 0), "list of image URLs to process during testing (can specify multiple)")
+	cmd.Flags().StringVarP(&notebook, "notebook", "b", "basic_test", "notebook to execute")
 	cmd.Flags().Int32VarP(&duration, "duration", "m", 15, "maximum test runtime in minutes (minimum is 15)")
 	cmd.Flags().StringArrayVarP(&emails, "email", "e", make([]string, 0), "email addresses to notify with test results (can specify multiple)")
 

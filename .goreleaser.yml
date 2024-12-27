@@ -42,27 +42,26 @@ release:
 changelog:
   use: github-native
 
-# brews: 
-#   - name: antithesis 
-#     ids: 
-#       - antithesis
-#     url_template: "https://github.com/guergabo/antithesis/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-#     commit_author:
-#       name: antithesis-bot
-#       email: gguergabo@gmail.com
-#     directory: Formula
-#     homepage: "https://antithesis.com"
-#     description: "A platform for building the impossible."
-#     license: "Apache-2.0"
-#     skip_upload: false
-#     test: |
-#       system "#{bin}/antithesis", "--version"
-#     repository: 
-#       owner: guergabo
-#       name: homebrew-antithesis
-#       branch: main
-#       # NEEDS PERMISSION TO CREATE AND MODIFY REPOS.
-#       token: "{{ .Env.GH_TOKEN_HOMEBREW_ANTITHESIS }}" # RIGHT HERE NEED TOKEN TO CREATE NEW REPO.
-#       pull_request:
-#         enabled: true
-#         draft: true
+brews: 
+  - name: antithesis 
+    ids: 
+      - antithesis
+    url_template: "https://github.com/guergabo/antithesis-cli/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    commit_author:
+      name: antithesis-bot
+      email: gguergabo@gmail.com
+    directory: Formula
+    homepage: "https://antithesis.com"
+    description: "A platform for building the impossible."
+    license: "Apache-2.0"
+    skip_upload: false
+    test: |
+      system "#{bin}/antithesis", "--version"
+    repository: 
+      owner: guergabo
+      name: homebrew-antithesis
+      branch: main
+      token: "{{ .Env.GH_TOKEN_HOMEBREW_ANTITHESIS }}"
+      pull_request:
+        enabled: true
+        draft: true
