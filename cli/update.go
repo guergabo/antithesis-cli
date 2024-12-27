@@ -28,7 +28,7 @@ antithesis update
 			current := version()
 			latest, err := latestVersion()
 			if err != nil {
-				fmt.Errorf("failed to get latest version: %w", err)
+				return fmt.Errorf("failed to get latest version: %w", err)
 			}
 
 			fmt.Printf("Current version: %s, latest version: %s\n", current, latest)
@@ -37,14 +37,14 @@ antithesis update
 				return nil
 			}
 			if current >= latest {
-				fmt.Printf("version %s is already latest\n", version)
+				fmt.Printf("version %s is already latest\n", current)
 			}
 
 			var confirm string
 			fmt.Printf("Do you want to perform the update to version %s?\n", latest)
 			fmt.Printf("Only 'yes' will be accepted to approve.\n")
 			fmt.Printf("Enter a value: ")
-			fmt.Scanln(&confirm)
+			_, _ = fmt.Scanln(&confirm)
 
 			if strings.ToLower(confirm) != "yes" {
 				return nil
