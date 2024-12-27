@@ -1,0 +1,47 @@
+name: build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: .go-version
+      - run: go mod download
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.54.2
+          args: --timeout 4m
+
+  test:
+    runs-on: ${{ matrix.os }}
+    concurrency:
+      group: ${{ matrix.os }}-${{ github.workflow }}-${{ github.event.number || github.ref }}
+      cancel-in-progress: true
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: .go-version
+      - run: go mod download
+      - run: make test-cover

@@ -1,0 +1,68 @@
+project_name: antithesis 
+dist: ./goreleaser/dist
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+gomod: 
+  proxy: true
+
+builds:
+  - id: antithesis
+    env:
+      - CGO_ENABLED=0
+    main: .
+    binary: antithesis
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    goarch: 
+      - amd64
+      - arm64
+    goos:
+      - darwin 
+      - linux 
+      - windows
+
+archives:
+  - id: antithesis 
+    builds: [antithesis]
+    format_overrides:
+      - goos: windows
+        format: zip
+
+release: 
+  github: 
+    owner: guergabo
+    name: antithesis 
+  draft: false 
+  prerelease: auto 
+  mode: replace 
+
+changelog:
+  use: github-native
+
+# brews: 
+#   - name: antithesis 
+#     ids: 
+#       - antithesis
+#     url_template: "https://github.com/guergabo/antithesis/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+#     commit_author:
+#       name: antithesis-bot
+#       email: gguergabo@gmail.com
+#     directory: Formula
+#     homepage: "https://antithesis.com"
+#     description: "A platform for building the impossible."
+#     license: "Apache-2.0"
+#     skip_upload: false
+#     test: |
+#       system "#{bin}/antithesis", "--version"
+#     repository: 
+#       owner: guergabo
+#       name: homebrew-antithesis
+#       branch: main
+#       # NEEDS PERMISSION TO CREATE AND MODIFY REPOS.
+#       token: "{{ .Env.GH_TOKEN_HOMEBREW_ANTITHESIS }}" # RIGHT HERE NEED TOKEN TO CREATE NEW REPO.
+#       pull_request:
+#         enabled: true
+#         draft: true
