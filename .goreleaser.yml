@@ -65,3 +65,5 @@ brews:
       pull_request:
         enabled: true
         draft: true
+        target_branch: main 
+        base_branch: formula-updates
