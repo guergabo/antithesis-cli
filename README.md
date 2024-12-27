@@ -1,4 +1,11 @@
-# Antithesis
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/bc44d6d0-2fcf-4aa6-88da-6a444e3cbcc2">
+    <img alt="antithesis logo" src="https://github.com/user-attachments/assets/4db6f803-6dcc-4118-8eb8-8ef188194a8f" height="100">
+  </picture>
+</p>
+
+<hr />
 
 [![Build](https://github.com/guergabo/antithesis-cli/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/guergabo/antithesis-cli/actions/workflows/build.yml)
 
