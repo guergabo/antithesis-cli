@@ -34,7 +34,7 @@ archives:
 release: 
   github: 
     owner: guergabo
-    name: antithesis 
+    name: antithesis-cli 
   draft: false 
   prerelease: auto 
   mode: replace 
