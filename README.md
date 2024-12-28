@@ -33,12 +33,12 @@ go install github.com/guergabo/antithesis-cli@latest
 Alternatively, you can download the latest `antithesis` binary from the
 [Releases](https://github.com/guergabo/antithesis/releases) page.
 
-### Create an Account
+### Create a Project
 
-To create an **Antithesis** account, or login to an existing account:
+To initialize an **Antithesis** project:
 
 ```console
-antithesis auth login
+antithesis init quickstart
 ```
 
 ### Create a Test Run
