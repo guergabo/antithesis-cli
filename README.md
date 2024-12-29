@@ -38,7 +38,7 @@ Alternatively, you can download the latest `antithesis` binary from the
 To initialize an **Antithesis** project:
 
 ```console
-antithesis init quickstart
+antithesis init quickstart ./output
 ```
 
 ### Create a Test Run

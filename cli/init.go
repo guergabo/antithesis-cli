@@ -85,7 +85,6 @@ antithesis init quickstart /Users/username/projects/my-quickstart
 					if err != nil {
 						return fmt.Errorf("failed to create directory %v: %w\n", directory, err)
 					}
-					exists = true
 				}
 			}
 
