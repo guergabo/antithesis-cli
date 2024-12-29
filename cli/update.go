@@ -92,6 +92,7 @@ func isHomebrew() bool {
 func updateCLI() error {
 	updateCommand := "brew update && brew upgrade antithesis"
 	if !isHomebrew() {
+		// TODO: support non-homebrew installation.
 		return fmt.Errorf("currently only support automatic updates with homebrew installations")
 	}
 	cmd := exec.Command("sh", "-c", updateCommand)
@@ -122,5 +123,6 @@ func latestVersion() (string, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
 		return "", fmt.Errorf("failed to decode release response: %w", err)
 	}
-	return strings.TrimPrefix(release.TagName, "v"), nil
+	// brew pr-pull creates tag of antithesis-{{ .Version }}.
+	return strings.TrimPrefix(release.TagName, "antithesis-"), nil
 }
