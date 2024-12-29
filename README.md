@@ -31,7 +31,7 @@ go install github.com/guergabo/antithesis-cli@latest
 ```
 
 Alternatively, you can download the latest `antithesis` binary from the
-[Releases](https://github.com/guergabo/antithesis/releases) page.
+[Releases](https://github.com/guergabo/antithesis-cli/releases) page.
 
 ### Create a Project
 
