@@ -1,7 +1,9 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -100,4 +102,25 @@ func updateCLI() error {
 		return fmt.Errorf("failed to run update command: %w", err)
 	}
 	return nil
+}
+
+func latestVersion() (string, error) {
+	resp, err := http.Get("https://api.github.com/repos/guergabo/homebrew-antithesis/releases/latest")
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch latest release: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("failed to fetch latest release: HTTP %d", resp.StatusCode)
+	}
+
+	release := struct {
+		TagName string `json:"tag_name"`
+	}{}
+
+	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
+		return "", fmt.Errorf("failed to decode release response: %w", err)
+	}
+	return strings.TrimPrefix(release.TagName, "v"), nil
 }
