@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -18,7 +19,7 @@ var (
 	}
 )
 
-// TODO: optimization to update the project only if the latest commit SHA is different.
+// TODO: optimizate to update the project only if the latest commit SHA is different.
 func initCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "init <project> [path]",
@@ -29,13 +30,15 @@ func initCommand() *cobra.Command {
 # Initialize in current directory
 antithesis init quickstart .		
 
-# Initialize in a new directory (exiting or not)
-antithesis init quickstart ./my-quickstart
+# Initialize in a new directory
+antithesis init quickstart ./output
 
 # Initialize with absolute path
-antithesis init quickstart /Users/username/projects/my-quickstart
+antithesis init quickstart /Users/username/projects/output
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.SilenceUsage = true
+
 			if len(args) == 0 {
 				cmd.Print(cmd.UsageString())
 				return nil
@@ -44,18 +47,16 @@ antithesis init quickstart /Users/username/projects/my-quickstart
 			project := args[0]
 			projectURL, ok := availableProjects[project]
 			if !ok {
-				cmd.SilenceUsage = true
 				keys := make([]string, 0, len(availableProjects))
 				for k := range availableProjects {
 					keys = append(keys, k)
 				}
-				cmd.Printf("Project %s is not supported.\n\nAvailable projects:\n%s", project, keys)
-				return nil // TODO: error handling. Choose this way across to not see the help page.
+				return fmt.Errorf("Project %s is not supported.\n\nAvailable projects:\n%s", project, keys)
 			}
 
 			cmd.Println(SubtleStyle.Render(fmt.Sprintf("Downloading project %s...", project)))
 
-			// Create temp dir to download project.
+			// Create temp directory to download project.
 
 			projectTempDir, err := os.MkdirTemp(os.TempDir(), "antithesis-*")
 			if err != nil {
@@ -65,36 +66,31 @@ antithesis init quickstart /Users/username/projects/my-quickstart
 
 			err = downloadAndExtractProject(projectURL, projectTempDir)
 			if err != nil {
-				return fmt.Errorf("Failed to download and extract quickstart: %w\n", err)
+				return fmt.Errorf("Failed to download and extract quickstart: %w", err)
 			}
 
-			// Check if directory is provided and empty. Defaults to current.
+			// Check if directory is provided and empty. Defaults to current directory.
 
 			directory := "."
 			if len(args) > 1 {
 				directory = args[1]
 				exists, err := directoryExists(directory)
 				if err != nil {
-					return fmt.Errorf("failed to check if directory exists: %w\n", err)
+					return fmt.Errorf("failed to check if directory exists: %w", err)
 				}
-
-				// Create the directory if it doesn't exist.
 				if !exists {
 					err := os.MkdirAll(directory, 0755)
 					if err != nil {
-						return fmt.Errorf("failed to create directory %v: %w\n", directory, err)
+						return fmt.Errorf("failed to create directory %v: %w", directory, err)
 					}
 				}
 			}
-
 			isEmpty, err := isDirectoryEmpty(directory)
 			if err != nil {
-				return fmt.Errorf("failed to check if directory is empty: %w\n", err)
+				return fmt.Errorf("failed to check if directory is empty: %w", err)
 			}
-			if !isEmpty { // TODO: prefer this route to control error output message for user error. vs return fmt.Errorf() for system error.
-				cmd.SilenceUsage = true
-				cmd.Printf("Could not create project in %s because directory is not empty\n", ValueStyle.Render(fmt.Sprintf("'%s'", directory)))
-				return nil
+			if !isEmpty {
+				return fmt.Errorf("Could not create project in %s because directory is not empty", ValueStyle.Render(fmt.Sprintf("'%s'", directory)))
 			}
 
 			// Attempt atomic rename from temp to final destination.
@@ -161,6 +157,8 @@ func untar(r io.Reader, dst string) error {
 
 	tr := tar.NewReader(gzr)
 
+	var topLevelDir string
+
 	for {
 		header, err := tr.Next()
 		switch {
@@ -172,7 +170,15 @@ func untar(r io.Reader, dst string) error {
 			continue
 		}
 
-		target := filepath.Join(dst, header.Name)
+		// We don't want the top-level directory created by GitHub.
+		if topLevelDir == "" {
+			parts := strings.Split(header.Name, "/")
+			if len(parts) > 1 {
+				topLevelDir = parts[0]
+			}
+		}
+		headNameWithoutTop := strings.TrimPrefix(header.Name, topLevelDir+"/")
+		target := filepath.Join(dst, headNameWithoutTop)
 
 		switch header.Typeflag {
 		case tar.TypeDir:

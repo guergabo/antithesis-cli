@@ -5,10 +5,6 @@ import "github.com/charmbracelet/lipgloss"
 var (
 	// Core colors.
 
-	defaultTextColor = lipgloss.AdaptiveColor{
-		Light: "#000000",
-		Dark:  "#ffffff",
-	}
 	primaryColor = lipgloss.ANSIColor(39)  // Bright blue
 	accentColor  = lipgloss.ANSIColor(141) // Light purple
 	mutedColor   = lipgloss.ANSIColor(242) // Gray
@@ -20,9 +16,6 @@ var (
 	errorColor   = lipgloss.ANSIColor(196) // Bright red
 
 	// Pre-defined core styles.
-
-	BaseStyle = lipgloss.NewStyle().
-			Foreground(defaultTextColor)
 
 	HeaderStyle = lipgloss.NewStyle().
 			Bold(true).

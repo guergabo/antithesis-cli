@@ -2,15 +2,13 @@ package cli
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/spf13/cobra"
 )
 
-// TODO: error handling.
-// TODO: contact command.
-// TODO: colors align.
-// TODO: make init less nested.
 // TODO: better latestVersion() to map with brew release.
+//
 // TODO: port all 3 repos to antithesishq and update 'guergabo' and url stuff.
 func AntithesisCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -27,7 +25,7 @@ func AntithesisCommand() *cobra.Command {
 The entrypoint of the antithesis ecosystem. Build the impossible.`),
 		Short: "Antithesis CLI",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Environment variables, config.
+			// TODO: Environment variables, config to with updating and secrets. For GitHub Action too.
 			// Eagerly inform customers of when a new update is available.
 			if cmd.Name() == "update" {
 				return nil
@@ -56,12 +54,11 @@ The entrypoint of the antithesis ecosystem. Build the impossible.`),
 
 	cmd.AddCommand(authCommand())
 	cmd.AddCommand(configCommand())
-	cmd.AddCommand(contactCommand())
 	cmd.AddCommand(updateCommand())
 	cmd.AddCommand(versionCommand())
 	cmd.AddCommand(debugCommand())
 	cmd.AddCommand(initCommand())
-	cmd.AddCommand(runCommand())
+	cmd.AddCommand(runCommand(&http.Client{}))
 
 	return cmd
 }

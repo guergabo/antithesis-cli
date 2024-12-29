@@ -11,7 +11,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func runCommand() *cobra.Command {
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+func runCommand(c HTTPClient) *cobra.Command {
 	var (
 		name        string
 		notebook    string
@@ -48,6 +52,8 @@ antithesis run \
   --duration=15 \
   --email='gguergabo@gmail.com'`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.SilenceUsage = true
+
 			url := fmt.Sprintf("https://%s.antithesis.com/api/v1/launch_experiment/%s", tenant, notebook)
 
 			if duration < 15 {
@@ -63,10 +69,10 @@ antithesis run \
 
 			params := map[string]string{
 				"antithesis.test_name":         name,
-				"antithesis.config_image":      trim(config),
-				"antithesis.images":            trim(strings.Join(images, ";")),
+				"antithesis.config_image":      trimWhitespace(config),
+				"antithesis.images":            trimWhitespace(strings.Join(images, ";")),
 				"antithesis.description":       description,
-				"antithesis.report.recipients": trim(strings.Join(emails, ";")),
+				"antithesis.report.recipients": trimWhitespace(strings.Join(emails, ";")),
 				"antithesis.duration":          fmt.Sprintf("%d", duration),
 			}
 
@@ -76,26 +82,30 @@ antithesis run \
 
 			jsonBody, err := json.Marshal(body)
 			if err != nil {
-				return fmt.Errorf("failed to marshal request body: %v\n", err)
+				return fmt.Errorf("failed to marshal request body: %v", err)
 			}
 
 			req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
 			if err != nil {
-				return fmt.Errorf("failed to create request: %v\n", err)
+				return fmt.Errorf("failed to create request: %v", err)
 			}
 
 			req.SetBasicAuth(username, password)
 			req.Header.Set("Content-Type", "application/json")
 
-			client := &http.Client{}
-			resp, err := client.Do(req)
+			resp, err := c.Do(req)
 			if err != nil {
-				return fmt.Errorf("failed to send request: %v\n", err)
+				return fmt.Errorf("failed to send request: %v", err)
 			}
 			defer resp.Body.Close()
 
 			if resp.StatusCode != 200 {
-				return fmt.Errorf("received non-200 response: %d", resp.StatusCode)
+				switch resp.StatusCode {
+				case 403:
+					return fmt.Errorf("access forbidden (HTTP 403): please verify your tenant, username, and password are correct")
+				default:
+					return fmt.Errorf("unexpected non-200 status code: %d", resp.StatusCode)
+				}
 			}
 
 			prettyPrintRunOutput(cmd, params)
@@ -111,7 +121,7 @@ antithesis run \
 	cmd.Flags().StringVarP(&config, "config", "c", "", "url of configuration image containing docker-compose setup")
 	cmd.Flags().StringArrayVarP(&images, "image", "i", make([]string, 0), "list of image URLs to process during testing (can specify multiple)")
 	cmd.Flags().StringVarP(&notebook, "notebook", "b", "basic_test", "notebook to execute")
-	cmd.Flags().Int32VarP(&duration, "duration", "m", 15, "maximum test runtime in minutes (minimum is 15)")
+	cmd.Flags().Int32VarP(&duration, "duration", "m", 15, "maximum test runtime in minutes (minimum is 15, the longer the deeper)")
 	cmd.Flags().StringArrayVarP(&emails, "email", "e", make([]string, 0), "email addresses to notify with test results (can specify multiple)")
 
 	requiredFlags := []string{
@@ -136,17 +146,15 @@ func prettyPrintRunOutput(cmd *cobra.Command, params map[string]string) {
 	recipients := params["antithesis.report.recipients"]
 	duration := params["antithesis.duration"]
 
-	cmd.Printf("\nSuccessfully submitted a request to launch test %s\n\n",
-		ValueStyle.Render(name+"!"))
-	cmd.Printf("\nYou should get a test report emailed to %s in about %s minutes (plus ~10 min to initialize your environment).\n",
+	cmd.Printf("\n%s\n\n\n",
+		SuccessStyle.Render(fmt.Sprintf("Successfully submitted a request to launch test run '%s'!", name)))
+	cmd.Printf("You should get a test report emailed to %s in about %s minutes (plus ~10 min to initialize your environment). So--set your timer!\n\n",
 		ValueStyle.Render(recipients),
 		ValueStyle.Render(duration))
-	cmd.Printf("If you encounter any issues, use the %s command to reach out.\n",
-		SubtleStyle.Render("'antithesis contact'")) // TODO: implement.
+	cmd.Printf("If you encounter any issues, use %s to reach out.\n",
+		ValueStyle.Render("Antithesis' discord"))
 }
 
-func trim(in string) string {
+func trimWhitespace(in string) string {
 	return strings.ReplaceAll(in, " ", "")
 }
-
-// TODO: environment variable to do deal with updating and secrets. For GitHub Action too.
