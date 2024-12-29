@@ -7,8 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TODO: better latestVersion() to map with brew release.
-//
 // TODO: port all 3 repos to antithesishq and update 'guergabo' and url stuff.
 func AntithesisCommand() *cobra.Command {
 	cmd := &cobra.Command{
