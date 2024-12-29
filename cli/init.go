@@ -1,6 +1,5 @@
 package cli
 
-// TODO:
 import (
 	"archive/tar"
 	"compress/gzip"

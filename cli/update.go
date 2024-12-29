@@ -45,7 +45,7 @@ antithesis update
 				return fmt.Errorf("failed to get latest version: %w", err)
 			}
 			if c.GreaterThanOrEqual(l) {
-				cmd.Printf("version %s is already latest\n", current)
+				cmd.Printf("version %s is already latest\n", ValueStyle.Render(current))
 				return nil
 			}
 

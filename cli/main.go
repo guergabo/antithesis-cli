@@ -10,6 +10,8 @@ import (
 // TODO: contact command.
 // TODO: colors align.
 // TODO: make init less nested.
+// TODO: better latestVersion() to map with brew release.
+// TODO: port all 3 repos to antithesishq and update 'guergabo' and url stuff.
 func AntithesisCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Version: version(),

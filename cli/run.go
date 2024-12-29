@@ -31,7 +31,7 @@ func runCommand() *cobra.Command {
 		Short:   "Run an antithesis test",
 		GroupID: "development",
 		Example: `
-# Run a test.
+# Run a test with 2 microservices and 3 infrastructure dependencies.
 antithesis run \
   --name='quickstart' \
   --description='Running a quick antithesis test.' \

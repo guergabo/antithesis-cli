@@ -41,7 +41,6 @@ func version() string {
 	return strings.TrimPrefix(version, "v")
 }
 
-// TODO: Get it directly from formula or somewhere else so it aligns with homebrew-antithesis release.
 func latestVersion() (string, error) {
 	resp, err := http.Get("https://api.github.com/repos/guergabo/antithesis-cli/releases/latest")
 	if err != nil {
