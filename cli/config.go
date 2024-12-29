@@ -4,6 +4,7 @@ import "github.com/spf13/cobra"
 
 func configCommand() *cobra.Command {
 	return &cobra.Command{
+		Hidden:  true,
 		Use:     "config",
 		Long:    "Manage your CLI configuration",
 		Short:   "Manage your CLI configuration",

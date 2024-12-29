@@ -2,16 +2,19 @@ package cli
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/spf13/cobra"
 )
 
+// TODO: error handling.
+// TODO: contact command.
+// TODO: colors align.
+// TODO: make init less nested.
 func AntithesisCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Version: version(),
 		Use:     "antithesis",
-		Long: `
+		Long: ValueStyle.Render(`
 █████╗ ███╗   ██╗████████╗██╗████████╗██╗  ██╗███████╗███████╗██╗███████╗
 ██╔══██╗████╗  ██║╚══██╔══╝██║╚══██╔══╝██║  ██║██╔════╝██╔════╝██║██╔════╝
 ███████║██╔██╗ ██║   ██║   ██║   ██║   ███████║█████╗  ███████╗██║███████╗
@@ -19,17 +22,20 @@ func AntithesisCommand() *cobra.Command {
 ██║  ██║██║ ╚████║   ██║   ██║   ██║   ██║  ██║███████╗███████║██║███████║
 ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝╚══════╝
 																					
-The entrypoint of the antithesis ecosystem. Build the impossible.`,
+The entrypoint of the antithesis ecosystem. Build the impossible.`),
 		Short: "Antithesis CLI",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			// TODO: Environment variables, config.
 			// Eagerly inform customers of when a new update is available.
+			if cmd.Name() == "update" {
+				return nil
+			}
 			current := version()
-			latest, _ := latestVersion() // suppress to not interfere.
+			latest, _ := latestVersion() // Suppress error to not block usage.
 			if current == "dev" || current >= latest {
 				return nil
 			}
-			fmt.Printf("A new update is available. To install it, run 'antithesis update'\n")
-			// TODO: Environment variables, config.
+			cmd.Printf("A new update is available. To install it, run %s\n", SubtleStyle.Render("'antithesis update'"))
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -42,16 +48,16 @@ The entrypoint of the antithesis ecosystem. Build the impossible.`,
 		Title: "Management Commands:",
 	})
 	cmd.AddGroup(&cobra.Group{
-		ID:    "antithesis",
+		ID:    "development",
 		Title: "Development Commands:",
 	})
 
-	cmd.AddCommand(authCommand())   // *
-	cmd.AddCommand(configCommand()) // *
+	cmd.AddCommand(authCommand())
+	cmd.AddCommand(configCommand())
 	cmd.AddCommand(contactCommand())
 	cmd.AddCommand(updateCommand())
 	cmd.AddCommand(versionCommand())
-	cmd.AddCommand(debugCommand()) // *
+	cmd.AddCommand(debugCommand())
 	cmd.AddCommand(initCommand())
 	cmd.AddCommand(runCommand())
 

@@ -5,36 +5,31 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/mail"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 )
-
-//
-// TODO: mention must build and push images first.
 
 func runCommand() *cobra.Command {
 	var (
 		name        string
-		notebook    string // for free trial will always be basic_test
+		notebook    string
 		tenant      string
 		description string
 		username    string
 		password    string
 		config      string
 		images      []string
-		duration    int32 // TODO: (min 15 - in minutes).
+		duration    int32
 		emails      []string
 	)
 
-	// TODO: environment variable to do deal with updating...for github action too...
-
 	cmd := &cobra.Command{
 		Use:     "run [flags]",
-		Long:    "Run an antithesis test.",
+		Long:    "Run an antithesis test. Note: Before running this command, you must first build and push all required images to either a public container registry or to Antithesis' private registry.",
 		Short:   "Run an antithesis test",
-		GroupID: "antithesis",
+		GroupID: "development",
 		Example: `
 # Run a test.
 antithesis run \
@@ -55,21 +50,25 @@ antithesis run \
 		RunE: func(cmd *cobra.Command, args []string) error {
 			url := fmt.Sprintf("https://%s.antithesis.com/api/v1/launch_experiment/%s", tenant, notebook)
 
-			// TODO: validation
-
-			// TODO: trim white space.
-			params := map[string]string{
-				// "antithesis.integrations.type": "cli", (cause error with validting parameter, but just stops)
-				"antithesis.test_name":         name,
-				"antithesis.config_image":      config,
-				"antithesis.images":            strings.Join(images, ";"),
-				"antithesis.description":       description,
-				"antithesis.report.recipients": strings.Join(emails, ";"),
-				"antithesis.duration":          fmt.Sprintf("%d", duration),
+			if duration < 15 {
+				return fmt.Errorf("duration can't be less than 15.")
 			}
 
-			// fmt.Printf("%v\n", params)
-			// return nil
+			for _, email := range emails {
+				_, err := mail.ParseAddress(email)
+				if err != nil {
+					return fmt.Errorf("email not valid: %w", err)
+				}
+			}
+
+			params := map[string]string{
+				"antithesis.test_name":         name,
+				"antithesis.config_image":      trim(config),
+				"antithesis.images":            trim(strings.Join(images, ";")),
+				"antithesis.description":       description,
+				"antithesis.report.recipients": trim(strings.Join(emails, ";")),
+				"antithesis.duration":          fmt.Sprintf("%d", duration),
+			}
 
 			body := &struct {
 				Params map[string]string `json:"params"`
@@ -99,13 +98,11 @@ antithesis run \
 				return fmt.Errorf("received non-200 response: %d", resp.StatusCode)
 			}
 
-			prettyPrintTestParameters(params)
-
+			prettyPrintRunOutput(cmd, params)
 			return nil
 		},
 	}
 
-	// TODO: antithesis run ( implicit antithesis.toml ) ( config will be toml ).
 	cmd.Flags().StringVarP(&name, "name", "n", "", "unique identifier for this test run")
 	cmd.Flags().StringVarP(&description, "description", "d", "", "description explaining the purpose of this test run")
 	cmd.Flags().StringVarP(&tenant, "tenant", "t", "", "target tenant ID for test execution")
@@ -134,17 +131,22 @@ antithesis run \
 	return cmd
 }
 
-// TODO: improve.
-func prettyPrintTestParameters(params map[string]string) {
+func prettyPrintRunOutput(cmd *cobra.Command, params map[string]string) {
 	name := params["antithesis.test_name"]
 	recipients := params["antithesis.report.recipients"]
 	duration := params["antithesis.duration"]
 
-	fmt.Printf("\nSuccessfully submitted a request to launch test %s\n\n",
-		lipgloss.NewStyle().Foreground(magentaColor).Render(name+"!"))
-	fmt.Printf("\nYou should get a test report emailed to %s in about %s minutes (plus ~10 min to initialize the test).\n",
-		lipgloss.NewStyle().Foreground(magentaColor).Render(recipients),
-		lipgloss.NewStyle().Bold(true).Render(duration))
-	fmt.Printf("If you encounter any issues, use the %s command to reach out.\n",
-		lipgloss.NewStyle().Bold(true).Render("antithesis contact"))
+	cmd.Printf("\nSuccessfully submitted a request to launch test %s\n\n",
+		ValueStyle.Render(name+"!"))
+	cmd.Printf("\nYou should get a test report emailed to %s in about %s minutes (plus ~10 min to initialize your environment).\n",
+		ValueStyle.Render(recipients),
+		ValueStyle.Render(duration))
+	cmd.Printf("If you encounter any issues, use the %s command to reach out.\n",
+		SubtleStyle.Render("'antithesis contact'")) // TODO: implement.
 }
+
+func trim(in string) string {
+	return strings.ReplaceAll(in, " ", "")
+}
+
+// TODO: environment variable to do deal with updating and secrets. For GitHub Action too.

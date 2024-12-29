@@ -4,6 +4,7 @@ import "github.com/spf13/cobra"
 
 func authCommand() *cobra.Command {
 	return &cobra.Command{
+		Hidden:  true,
 		Use:     "auth",
 		Long:    "Authenticate with Antithesis",
 		Short:   "Authenticate with Antithesis",

@@ -1,10 +1,10 @@
 package cli
 
-// TODO:
 import "github.com/spf13/cobra"
 
 func contactCommand() *cobra.Command {
 	return &cobra.Command{
+		Hidden:  true,
 		Use:     "contact",
 		Long:    "Reach out to the developers of Antithesis for help or feedback",
 		Short:   "Get help or give feedback",
