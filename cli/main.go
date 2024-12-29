@@ -35,7 +35,7 @@ The entrypoint of the antithesis ecosystem. Build the impossible.`),
 			if current == "dev" || current >= latest {
 				return nil
 			}
-			cmd.Printf("A new update is available. To install it, run %s\n", SubtleStyle.Render("'antithesis update'"))
+			cmd.Printf("%s\n", HeaderStyle.Render("A new update is available. To install it, run 'antithesis update'"))
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
