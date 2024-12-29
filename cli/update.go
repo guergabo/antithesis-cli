@@ -92,7 +92,7 @@ func isHomebrew() bool {
 func updateCLI() error {
 	updateCommand := "brew update && brew upgrade antithesis"
 	if !isHomebrew() {
-		// TODO: support non-homebrew installation.
+		// TODO: support non-homebrew installation (curl, nix).
 		return fmt.Errorf("currently only support automatic updates with homebrew installations")
 	}
 	cmd := exec.Command("sh", "-c", updateCommand)
