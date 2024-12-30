@@ -123,6 +123,5 @@ func latestVersion() (string, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
 		return "", fmt.Errorf("failed to decode release response: %w", err)
 	}
-	// brew pr-pull creates tag of antithesis-{{ .Version }}.
-	return strings.TrimPrefix(release.TagName, "antithesis-"), nil
+	return strings.TrimPrefix(release.TagName, "v"), nil
 }
