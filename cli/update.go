@@ -13,8 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TODO: pass it client so that you can mock it.
-
 func updateCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "update",
