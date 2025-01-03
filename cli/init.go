@@ -8,9 +8,15 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/maps"
+)
+
+const (
+	antithesisDir = "antithesis"
 )
 
 var (
@@ -47,18 +53,19 @@ antithesis init quickstart /Users/username/projects/output
 			project := args[0]
 			projectURL, ok := availableProjects[project]
 			if !ok {
-				keys := make([]string, 0, len(availableProjects))
-				for k := range availableProjects {
-					keys = append(keys, k)
-				}
-				return fmt.Errorf("Project %s is not supported.\n\nAvailable projects:\n%s", project, keys)
+				keys := strings.Join(maps.Keys(availableProjects), "\n  - ")
+				return fmt.Errorf("Project %q is not supported.\n\nAvailable projects:\n  - %s", project, keys)
 			}
 
 			cmd.Println(SubtleStyle.Render(fmt.Sprintf("Downloading project %s...", project)))
 
 			// Create temp directory to download project.
 
-			projectTempDir, err := os.MkdirTemp(os.TempDir(), "antithesis-*")
+			cfg, err := getUserConfigDir()
+			if err != nil {
+				return fmt.Errorf("failed to get user config directory: %w", err)
+			}
+			projectTempDir, err := os.MkdirTemp(cfg, "antithesis-*")
 			if err != nil {
 				return fmt.Errorf("failed to create temp dir: %w", err)
 			}
@@ -93,15 +100,16 @@ antithesis init quickstart /Users/username/projects/output
 				return fmt.Errorf("Could not create project in %s because directory is not empty", ValueStyle.Render(fmt.Sprintf("'%s'", directory)))
 			}
 
-			// Attempt atomic rename from temp to final destination.
+			// Copy over files.
 
 			path, err := filepath.Abs(directory)
 			if err != nil {
 				return fmt.Errorf("failed to get absolute path of directory: %w", err)
 			}
-			err = os.Rename(projectTempDir, path+"/"+project)
+			targetPath := filepath.Join(path, project)
+			err = os.CopyFS(targetPath, os.DirFS(projectTempDir))
 			if err != nil {
-				return fmt.Errorf("failed to rename directory: %w", err)
+				return fmt.Errorf("failed to copy directory: %w", err)
 			}
 			cmd.Println(SuccessStyle.Render(fmt.Sprintf("Project %s was created in %s", project, path)))
 			return nil
@@ -195,10 +203,45 @@ func untar(r io.Reader, dst string) error {
 			if err != nil {
 				return err
 			}
+			defer f.Close()
 			if _, err := io.Copy(f, tr); err != nil {
 				return err
 			}
-			f.Close()
 		}
 	}
+}
+
+func getUserConfigDir() (string, error) {
+	var (
+		configDir string
+		err       error
+	)
+	switch runtime.GOOS {
+	case "windows":
+		configDir, err = os.UserConfigDir()
+		if err != nil {
+			return "", err
+		}
+	case "darwin":
+		configDir, err = os.UserConfigDir()
+		if err != nil {
+			return "", err
+		}
+	// Linux.
+	default:
+		configDir = os.Getenv("XDG_CONFIG_HOME")
+		if configDir == "" {
+			configDir, err = os.UserConfigDir()
+			if err != nil {
+				return "", err
+			}
+		}
+	}
+	// Lazily create it (if needed).
+	antithesisUserConfigDir := filepath.Join(configDir, antithesisDir)
+	err = os.MkdirAll(antithesisUserConfigDir, 0755)
+	if err != nil {
+		return "", err
+	}
+	return antithesisUserConfigDir, nil
 }

@@ -4,10 +4,10 @@ go 1.23.3
 
 require (
 	github.com/charmbracelet/lipgloss v1.0.0
-	github.com/golang/mock v1.6.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
+	golang.org/x/exp v0.0.0-20250103183323-7d7fa50e5329
 )
 
 require (
