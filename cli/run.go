@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/mail"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -108,7 +109,7 @@ antithesis run \
 				}
 			}
 
-			prettyPrintRunOutput(cmd, params)
+			prettyPrintRunOutput(cmd, params, duration)
 			return nil
 		},
 	}
@@ -141,16 +142,19 @@ antithesis run \
 	return cmd
 }
 
-func prettyPrintRunOutput(cmd *cobra.Command, params map[string]string) {
+func prettyPrintRunOutput(cmd *cobra.Command, params map[string]string, duration_mins int32) {
 	name := params["antithesis.test_name"]
 	recipients := params["antithesis.report.recipients"]
-	duration := params["antithesis.duration"]
 
-	cmd.Printf("\n%s\n\n\n",
+	duration := (time.Duration(duration_mins) * time.Minute) + (10 * time.Minute)
+	finishesApprox := time.Now().Add(duration)
+
+	cmd.Printf("\n%s\n\n",
 		SuccessStyle.Render(fmt.Sprintf("Successfully submitted a request to launch test run '%s'!", name)))
-	cmd.Printf("You should get a test report emailed to %s in about %s minutes (plus ~10 min to initialize your environment). So--set your timer!\n\n",
+	cmd.Printf("You should receive a test report emailed to %s around %s.\n",
 		ValueStyle.Render(recipients),
-		ValueStyle.Render(duration))
+		ValueStyle.Render(finishesApprox.Format("Jan 2 3:04PM")))
+	cmd.Printf("(Thats roughly %s from now including setup)\n\n", ValueStyle.Render(duration.String()))
 	cmd.Printf("If you encounter any issues, use %s to reach out.\n",
 		ValueStyle.Render("Antithesis' discord"))
 }
