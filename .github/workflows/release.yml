@@ -11,7 +11,7 @@ permissions:
 jobs:
   goreleaser:
     env:
-      GH_TOKEN_HOMEBREW_ANTITHESIS: ${{ secrets.GH_TOKEN_HOMEBREW_ANTITHESIS }}
+      GH_TOKEN_HOMEBREW_ANTITHESIS: ${{ secrets.GH_TOKEN_HOMEBREW_ANTITHESIS_2 }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
