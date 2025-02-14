@@ -25,4 +25,4 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN_HOMEBREW_ANTITHESIS: ${{ secrets.GH_TOKEN_HOMEBREW_ANTITHESIS_2 }}
+          GH_TOKEN_HOMEBREW_ANTITHESIS: ${{ secrets.GH_TOKEN_HOMEBREW_ANTITHESIS }}
